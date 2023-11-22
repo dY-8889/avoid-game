@@ -1,4 +1,6 @@
 use bevy::{prelude::*, sprite::collide_aabb::collide};
+use rand::seq::SliceRandom;
+use std::fs::read_dir;
 use std::{ops::RangeInclusive, time::Duration};
 
 use rand::{thread_rng, Rng};
@@ -50,6 +52,9 @@ struct Player;
 #[derive(Component)]
 struct Attack;
 
+#[derive(Resource)]
+struct DamageSound(Vec<Handle<AudioSource>>);
+
 #[derive(Bundle)]
 struct AttackBundle {
     sprite_bundle: SpriteBundle,
@@ -92,8 +97,6 @@ impl AttackBundle {
 }
 
 impl AttackType {
-    const NORMAL: Vec2 = Vec2::new(25., 25.);
-
     // 攻撃の速度
     fn speed(&self) -> f32 {
         match self {
@@ -106,16 +109,21 @@ impl AttackType {
             AttackType::Normal => Vec2::new(25., 25.),
         }
     }
-    fn create_intervar(&self) -> f32 {
-        match self {
-            AttackType::Normal => 0.3,
-        }
-    }
 }
 
-fn setup(mut commands: Commands) {
+fn setup(mut commands: Commands, assets_server: Res<AssetServer>) {
     commands.spawn(Camera2dBundle::default());
 
+    let mut sounds: Vec<Handle<AudioSource>> = Vec::new();
+    let sound_paths = get_folder("assets/audio");
+
+    for path in sound_paths {
+        sounds.push(assets_server.load(path));
+    }
+    // サウンドをリソースに追加
+    commands.insert_resource(DamageSound(sounds));
+
+    // プレイヤーを作成
     commands.spawn((
         SpriteBundle {
             transform: Transform {
@@ -187,12 +195,43 @@ fn move_attack(mut query: Query<(&mut Transform, &AttackType), With<Attack>>) {
 }
 // プレイヤーが攻撃と衝突した時に発生するイベントの処理
 fn damage_event(
+    mut commands: Commands,
     mut damage_event: EventReader<DamageEvent>,
     mut query: Query<&mut Transform, With<Player>>,
+    sound: Res<DamageSound>,
 ) {
     for event in damage_event.read() {
+        // ランダムな音を鳴らす
+        let r_sound = sound.0.choose(&mut thread_rng()).unwrap();
+        commands.spawn(AudioBundle {
+            source: r_sound.clone(),
+            settings: PlaybackSettings::DESPAWN,
+            ..default()
+        });
+
+        // 攻撃のタイプによって処理
         match event.attack_type {
             AttackType::Normal => query.single_mut().scale += 2.,
         }
     }
+}
+
+// oggファイルのみ抽出する
+fn get_folder(target_path: &str) -> Vec<String> {
+    let mut folder: Vec<String> = Vec::new();
+
+    if let Ok(folder_path) = read_dir(target_path) {
+        for dir_entry in folder_path {
+            // 拡張子があったら
+            if let Some(extension) = &dir_entry.as_ref().unwrap().path().extension() {
+                // oggだったら
+                if *extension == "ogg" {
+                    let path = dir_entry.unwrap().path().to_string_lossy().into_owned();
+                    folder.push(path[7..].to_string());
+                }
+            }
+        }
+    }
+
+    folder
 }
