@@ -8,8 +8,8 @@ use rand::{thread_rng, Rng};
 // プレイヤーの初期位置
 const INITIAL_PLAYER_POSITION: Vec2 = Vec2::new(0.0, -300.0);
 // プレイヤーが移動できる限界
-const PLAYER_MOVE_LIMIT_LEFT: f32 = -475.0;
-const PLAYER_MOVE_LIMIT_RIGHT: f32 = 475.0;
+const PLAYER_MOVE_LIMIT_LEFT: f32 = -375.0;
+const PLAYER_MOVE_LIMIT_RIGHT: f32 = 375.0;
 // プレイヤーの速度
 const PLAYER_SPEED: f32 = 7.5;
 
@@ -18,14 +18,14 @@ const ATTACK_START_POSITION_Y: f32 = 350.0;
 // 攻撃が作られる範囲(プレイヤーが移動できる範囲)
 const ATTACK_CREATE_RANGE: RangeInclusive<f32> = PLAYER_MOVE_LIMIT_LEFT..=PLAYER_MOVE_LIMIT_RIGHT;
 // 攻撃が作られる時間の間隔
-const ATTACK_CREATE_INTERVAR_TIME_RANGE: RangeInclusive<f32> = 0.2..=0.5;
+const ATTACK_CREATE_INTERVAR_TIME_RANGE: RangeInclusive<f32> = 0.1..=0.3;
 
 fn main() {
     App::new()
         .add_plugins(DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 title: "避けゲー".into(),
-                resolution: (1000., 720.).into(),
+                resolution: (800., 720.).into(),
                 enabled_buttons: bevy::window::EnabledButtons {
                     maximize: false,
                     ..default()
@@ -190,6 +190,7 @@ fn create_attack(mut commands: Commands, mut time: ResMut<Time<Fixed>>) {
 // 攻撃を動かす
 fn move_attack(mut query: Query<(&mut Transform, &AttackType), With<Attack>>) {
     for (mut transform, attack_type) in &mut query {
+        // 攻撃の種類によって速度を変える
         transform.translation.y -= attack_type.speed();
     }
 }
