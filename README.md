@@ -12,9 +12,13 @@
 * 左移動
   * 左矢印 or A
 
-使用させていただいたサウンド
+お借りした素材
 
-[無料効果音で遊ぼう！](https://taira-komori.jpn.org/attack01.html#google_vignette)
+[七三ゆきのアトリエ](https://nanamiyuki.com/)
+
+[無料効果音で遊ぼう！](https://taira-komori.jpn.org)
+
+[効果音ラボ](https://soundeffect-lab.info)
 
 <details><summary></summary><div>
 
