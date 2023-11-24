@@ -124,5 +124,9 @@ fn create_item(mut commands: Commands, image: Res<Images>) {
 fn portion(mut player_date: ResMut<PlayerDate>, mut state: ResMut<NextState<ItemType>>) {
     player_date.hp += 10;
 
+    if player_date.hp > 100 {
+        player_date.hp = 100
+    }
+
     state.set(Null);
 }

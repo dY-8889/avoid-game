@@ -29,10 +29,10 @@ impl Default for PlayerDate {
     }
 }
 
+// プレイヤーの状態
+// 使わないかも
 #[derive(Default, Debug)]
 pub enum Condition {
-    SpeedUp,
-    Big,
     #[default]
     Normal,
 }
