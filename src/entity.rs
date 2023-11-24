@@ -5,6 +5,8 @@ use bevy::{
 
 use crate::Images;
 
+// 使おうとしたがいまいちうまくいかなかった機能
+
 pub trait EntityBundle {}
 pub trait EntityType {
     fn speed(&self) -> f32;
